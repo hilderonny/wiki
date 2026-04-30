@@ -1,0 +1,13 @@
+{
+    "short_name": "Wiki",
+    "name": "Wiki",
+    "icons": [
+        {
+            "src": "images/wiki.png",
+            "type": "image/png",
+            "sizes": "144x144"
+        }
+    ],
+    "start_url": "index.html",
+    "display": "standalone"
+}
