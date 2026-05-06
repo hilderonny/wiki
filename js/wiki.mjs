@@ -149,4 +149,5 @@ Vue.createApp(vueApp).mount('body')
 TODO:
 - Verschieben
 - Seiten private machen
+- updatedatabase.html löschen, wenn Wiki aktualisiert wurde
 */
