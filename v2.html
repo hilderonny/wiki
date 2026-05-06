@@ -22,7 +22,12 @@
                 <div class="app-title">WIKI</div>
             </header>
             <nav id="hierarchy">
-                <navigation-element v-for="rootHierarchyElement in hierarchy" :hierarchy-element="rootHierarchyElement" @hierarchy-element-clicked="handleHierarchyElementClicked"></navigation-element>
+                <navigation-element 
+                    v-for="rootHierarchyElement in hierarchy" 
+                    :hierarchy-element="rootHierarchyElement" 
+                    @hierarchy-element-clicked="handleHierarchyElementClicked"
+                    @hierarchy-element-toggled="handleHierarchyElementToggled"
+                ></navigation-element>
             </nav>
         </aside>
 
@@ -34,20 +39,20 @@
         <div class="">
 
             <header id="topbar">
-                <div class="page-title" id="pagetitle"></div>
+                <div class="page-title" id="pagetitle">{{ selectedHierarchyElement?.Title }}</div>
                 <div class="buttons">
                     <button onclick="location.reload()">Aktualisieren</button>
-                    <button id="addbutton">Neu</button>
-                    <button class="invisible" id="renamebutton">Umbenennen</button>
-                    <button class="invisible" id="editbutton">Bearbeiten</button>
-                    <button class="invisible" id="cancelbutton">Abbrechen</button>
-                    <button class="invisible" disabled id="savebutton">Speichern</button>
-                    <button class="invisible" id="deletebutton">Löschen</button>
+                    <button @click="handleAddButtonClick">Neu</button>
+                    <button v-if="selectedHierarchyElement" @click="handleRenameButtonClick">Umbenennen</button>
+                    <button v-if="selectedArticle && !isEditing" @click="handleEditButtonClick">Bearbeiten</button>
+                    <button v-if="isEditing" @click="handleCancelButtonClick">Abbrechen</button>
+                    <button v-if="isEditing" @click="handleSaveButtonClick" :disabled="!isContentChanged">Speichern</button>
+                    <button v-if="selectedHierarchyElement" @click="handleDeleteButtonClick">Löschen</button>
                 </div>
             </header>
                     
             <div class="main">
-                <textarea class="invisible" id="editor"></textarea>
+                <textarea v-if="selectedArticle && isEditing" v-model="selectedArticle.Content" @input="isContentChanged = true" @keydown="handleTextareaKeyDown"></textarea>
                 <div id="preview" v-if="selectedArticle" v-html="formatSelectedArticle"></div>
             </div>
 
