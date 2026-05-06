@@ -159,7 +159,7 @@ document.getElementById('addbutton').addEventListener('click', async () => {
     childrenList.push(newChild)
     ORIGINAL_CONTENT = '# ' + label + '\n'
     EDITOR_TEXTAREA.value = ORIGINAL_CONTENT
-    await Arrange.postPublicFile('/wiki/nodes/' + filename, ORIGINAL_CONTENT)
+    await Arrange.postPublicTextFile('/wiki/nodes/' + filename, ORIGINAL_CONTENT)
     await saveHierarchy()
     SELECTED_FILENAME = filename
     PAGETITLE_DIV.innerHTML = label
