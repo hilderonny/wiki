@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="module">
+
+            import * as Arrange from '/arrange/js/arrange.mjs'
+            import Article from './js/types/Article.mjs'
+            import Database from './js/templates/Database.mjs'
+            import Hierarchy from './js/types/Hierarchy.mjs'
+
+            async function importHierarchyNode(hierarchyNode, parentId) {
+                const id = hierarchyNode.filename
+                // Article
+                const fileContentResponse = await Arrange.getPublicFile('/wiki/nodes/' + id)
+                const fileContent = fileContentResponse.ok ? await fileContentResponse.text() : ''
+                const article = new Article({
+                    Id: id,
+                    Content: fileContent,
+                })
+                console.log(article)
+                await article.save()
+                // Hierarchy element
+                const hierarchyElement = new Hierarchy({
+                    ArticleId: id,
+                    Id: id,
+                    LastEditedAt: hierarchyNode.lasteditedat,
+                    LastEditedBy: hierarchyNode.lasteditedby,
+                    Title: hierarchyNode.label,
+                })
+                if (parentId) {
+                    hierarchyElement.ParentId = parentId
+                }
+                console.log(hierarchyElement)
+                await hierarchyElement.save()
+                // Children
+                if (hierarchyNode.children) {
+                    for (const childHierarchyNode of hierarchyNode.children) {
+                        await importHierarchyNode(childHierarchyNode, id)
+                    }
+                }
+
+            }
+
+            // Update database schema
+            for (const [ databaseName, databaseSchema ] of Object.entries(Database)) {
+                console.log(`Update schema for database "${databaseName}" ...`)
+                await Arrange.updateDatabase(databaseName, databaseSchema)
+            }
+
+            // Import from files
+            const hierarchyFromFiles = await(await Arrange.getPublicFile('/wiki/hierarchy.json')).json()
+            for (const hierarchyNode of hierarchyFromFiles) {
+                await importHierarchyNode(hierarchyNode, undefined)
+            }
+
+            console.log('Done.')
+
+        </script>
+    </head>
+  
+</html>
