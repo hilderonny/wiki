@@ -257,6 +257,12 @@ td, th {
     overflow: hidden;
 }
 
+#lastedited {
+    color: #888888;
+    font-size: 11px;
+    text-align: center;
+}
+
 @media (max-width: 768px) {
 
     .menu-toggle {

@@ -15,6 +15,7 @@ const SAVE_BUTTON = document.getElementById('savebutton')
 const EDIT_BUTTON = document.getElementById('editbutton')
 const DELETE_BUTTON = document.getElementById('deletebutton')
 const RENAME_BUTTON = document.getElementById('renamebutton')
+const LAST_EDITED_DIV = document.getElementById('lastedited')
 
 const OPEN_NAV_ELEMENTS = JSON.parse(localStorage.getItem('openNavElements') || '{}')
 
@@ -110,6 +111,11 @@ async function loadContent() {
     RENAME_BUTTON.classList.remove('invisible')
     hideEditor()
     PAGETITLE_DIV.innerHTML = SELECTED_HIERARCHY_NODE?.label
+    if (SELECTED_HIERARCHY_NODE?.lasteditedat && SELECTED_HIERARCHY_NODE?.lasteditedby) {
+        LAST_EDITED_DIV.innerHTML = `Zuletzt bearbeitet am ${new Date(SELECTED_HIERARCHY_NODE?.lasteditedat).toLocaleString()} von ${SELECTED_HIERARCHY_NODE?.lasteditedby}`
+    } else {
+        LAST_EDITED_DIV.innerHTML = ''
+    }
 }
 
 // Baut den DOM der Hierarchie komplett neu auf, wird nach jeder Änderung gemacht
@@ -130,6 +136,9 @@ async function save() {
     const content = EDITOR_TEXTAREA.value
     await Arrange.postPublicTextFile('/wiki/nodes/' + SELECTED_FILENAME, content)
     ORIGINAL_CONTENT = content
+    SELECTED_HIERARCHY_NODE.lasteditedby = localStorage.getItem('username')
+    SELECTED_HIERARCHY_NODE.lasteditedat = Date.now()
+    await saveHierarchy()
     SAVE_BUTTON.setAttribute('disabled', 'disabled')
 }
 
