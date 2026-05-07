@@ -41,6 +41,7 @@
             <header id="topbar">
                 <div class="page-title" id="pagetitle">{{ selectedHierarchyElement?.Title }}</div>
                 <div class="buttons">
+                    <button v-if="selectedHierarchyElement" :class="{ private: selectedHierarchyElement.IsPrivate }" @click="handlePrivateButtonClick">{{ selectedHierarchyElement.IsPrivate ? '🔒 Privat' : '🔓 Öffentlich' }}</button>
                     <button onclick="location.reload()">Aktualisieren</button>
                     <button @click="handleAddButtonClick">Neu</button>
                     <button v-if="selectedHierarchyElement" @click="handleRenameButtonClick">Umbenennen</button>
@@ -52,11 +53,11 @@
             </header>
                     
             <div class="main">
-                <textarea v-if="selectedArticle && isEditing" v-model="selectedArticle.Content" @input="isContentChanged = true" @keydown="handleTextareaKeyDown"></textarea>
+                <textarea v-if="selectedArticle && isEditing" v-model="selectedArticle.Content" id="editor" @input="isContentChanged = true" @keydown="handleTextareaKeyDown"></textarea>
                 <div id="preview" v-if="selectedArticle" v-html="formatSelectedArticle"></div>
             </div>
 
-            <div id="lastedited"></div>
+            <div v-if="selectedHierarchyElement && selectedHierarchyElement.LastEditedAt && selectedHierarchyElement.LastEditedBy" id="lastedited">Zuletzt bearbeitet am {{ new Date(selectedHierarchyElement.LastEditedAt).toLocaleString() }} von {{ selectedHierarchyElement.LastEditedBy }}</div>
 
         </div>
         

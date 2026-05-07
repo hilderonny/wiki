@@ -8,7 +8,7 @@ const NavigationElement = {
     ],
     template: `
         <details :class="{ empty: !hierarchyElement.children }" :open="hierarchyElement.isOpen" @toggle="(event) => { $emit('hierarchyElementToggled', hierarchyElement, event.target.open) }">
-            <summary><label :class="{ selected: hierarchyElement.isSelected }" @click="$emit('hierarchyElementClicked', hierarchyElement)">{{ hierarchyElement.Title }}</label></summary>
+            <summary><label :class="{ selected: hierarchyElement.isSelected }" @click="$emit('hierarchyElementClicked', hierarchyElement)">{{ hierarchyElement.Title }} {{ hierarchyElement.IsPrivate ? '🔒' : '' }}</label></summary>
             <navigation-element
                 v-if="hierarchyElement.children" 
                 v-for="childElement in hierarchyElement.children" 

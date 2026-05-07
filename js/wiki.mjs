@@ -26,7 +26,8 @@ const vueApp = {
     },
     async created() {
         this.openNavigationElements = JSON.parse(localStorage.getItem('openNavElements') || '{}')
-        const hierarchyFromServer = await Hierarchy.loadListWithQuery('SELECT * FROM Hierarchy ORDER BY Title')
+        const userId = localStorage.getItem('userid')
+        const hierarchyFromServer = await Hierarchy.loadListWithQuery(`SELECT * FROM Hierarchy WHERE IsPrivate IS NULL OR IsPrivate=0 OR OwnerId='${userId}' ORDER BY Title`)
         for (const hierarchyElement of hierarchyFromServer) {
             if (hierarchyElement.ParentId) {
                 const parentElement = hierarchyFromServer.find(element => element.Id === hierarchyElement.ParentId)
@@ -54,8 +55,10 @@ const vueApp = {
             await article.save()
             const hierarchyElement = new Hierarchy({ 
                 ArticleId: article.Id,
+                IsPrivate: true,
                 LastEditedAt: Date.now(),
                 LastEditedBy: localStorage.getItem('username'),
+                OwnerId: localStorage.getItem('userid'),
                 Title: title,
             })
             if (this.selectedHierarchyElement) {
@@ -66,12 +69,12 @@ const vueApp = {
                 this.selectedHierarchyElement.children.push(hierarchyElement)
                 this.selectedHierarchyElement.children.sort((element1, element2) => element1.Title.localeCompare(element2.Title))
                 await this.handleHierarchyElementToggled(this.selectedHierarchyElement, true)
+                hierarchyElement.parentElement = this.selectedHierarchyElement
             } else {
                 this.hierarchy.push(hierarchyElement)
                 this.hierarchy.sort((element1, element2) => element1.Title.localeCompare(element2.Title))
             }
-            await hierarchyElement.save()
-            hierarchyElement.parentElement = this.selectedHierarchyElement
+            await this.saveHierarchyElement(hierarchyElement)
             await this.handleHierarchyElementClicked(hierarchyElement)
             this.isEditing = true
         },
@@ -114,15 +117,12 @@ const vueApp = {
             const newTitle = prompt('Bezeichnung', this.selectedHierarchyElement.Title)
             if (newTitle) {
                 this.selectedHierarchyElement.Title = newTitle
-                // Ringabhängigkeiten vermeiden
-                const parentElement = this.selectedHierarchyElement.parentElement
-                delete this.selectedHierarchyElement.parentElement
-                const children = this.selectedHierarchyElement.children
-                delete this.selectedHierarchyElement.children
-                await this.selectedHierarchyElement.save()
-                this.selectedHierarchyElement.parentElement = parentElement
-                this.selectedHierarchyElement.children = children
+                await this.saveHierarchyElement(this.selectedHierarchyElement)
             }
+        },
+        async handlePrivateButtonClick() {
+            this.selectedHierarchyElement.IsPrivate = !this.selectedHierarchyElement.IsPrivate
+            await this.saveHierarchyElement(this.selectedHierarchyElement)
         },
         async handleSaveButtonClick() {
             await this.selectedArticle.save()
@@ -139,15 +139,18 @@ const vueApp = {
         async loadArticle() {
             this.selectedArticle = await Article.loadFromDatabase(this.selectedHierarchyElement.ArticleId)
             history.pushState(undefined, undefined, '?' + this.selectedHierarchyElement.Id)
-        }
+        },
+        async saveHierarchyElement(hierarchyElement) {
+            // Ringabhängigkeiten vermeiden
+            const parentElement = hierarchyElement.parentElement
+            delete hierarchyElement.parentElement
+            const children = hierarchyElement.children
+            delete hierarchyElement.children
+            await hierarchyElement.save()
+            hierarchyElement.parentElement = parentElement
+            hierarchyElement.children = children
+        },
     }
 }
 
 Vue.createApp(vueApp).mount('body')
-
-/*
-TODO:
-- Verschieben
-- Seiten private machen
-- updatedatabase.html löschen, wenn Wiki aktualisiert wurde
-*/
