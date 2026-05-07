@@ -97,6 +97,7 @@ const vueApp = {
             this.isEditing = true
         },
         async handleHierarchyElementClicked(hierarchyElement) {
+            this.isEditing = false
             if (this.selectedHierarchyElement) {
                 this.selectedHierarchyElement.isSelected = false
             }
@@ -126,12 +127,14 @@ const vueApp = {
         },
         async handleSaveButtonClick() {
             await this.selectedArticle.save()
+            await this.saveHierarchyElement(this.selectedHierarchyElement)
             this.isEditing = false
         },
         async handleTextareaKeyDown(event) {
             if (event.ctrlKey && event.key === 's') {
                 event.preventDefault()
                 await this.selectedArticle.save()
+                await this.saveHierarchyElement(this.selectedHierarchyElement)
                 this.isContentChanged = false
                 this.contentBeforeEditing = '' + this.selectedArticle.Content
             }
@@ -141,6 +144,10 @@ const vueApp = {
             history.pushState(undefined, undefined, '?' + this.selectedHierarchyElement.Id)
         },
         async saveHierarchyElement(hierarchyElement) {
+            // Beim Speichern immer den Owner neu setzen - Wer schreiben kann, ist Owner, basta!
+            hierarchyElement.OwnerId = localStorage.getItem('userid')
+            hierarchyElement.LastEditedAt = Date.now()
+            hierarchyElement.LastEditedBy = localStorage.getItem('username')
             // Ringabhängigkeiten vermeiden
             const parentElement = hierarchyElement.parentElement
             delete hierarchyElement.parentElement
