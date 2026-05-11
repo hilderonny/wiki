@@ -27,7 +27,7 @@ const vueApp = {
     async created() {
         this.openNavigationElements = JSON.parse(localStorage.getItem('openNavElements') || '{}')
         const userId = localStorage.getItem('userid')
-        const hierarchyFromServer = await Hierarchy.loadListWithQuery(`SELECT * FROM Hierarchy WHERE IsPrivate IS NULL OR IsPrivate=0 OR OwnerId='${userId}' ORDER BY Title`)
+        const hierarchyFromServer = await Hierarchy.query(`SELECT * FROM Hierarchy WHERE IsPrivate IS NULL OR IsPrivate=0 OR OwnerId='${userId}' ORDER BY Title`)
         for (const hierarchyElement of hierarchyFromServer) {
             if (hierarchyElement.ParentId) {
                 const parentElement = hierarchyFromServer.find(element => element.Id === hierarchyElement.ParentId)
@@ -87,7 +87,7 @@ const vueApp = {
             if (this.selectedHierarchyElement.parentElement) {
                 this.selectedHierarchyElement.parentElement.children.splice(this.selectedHierarchyElement.parentElement.children.indexOf(this.selectedHierarchyElement), 1)
             }
-            await this.selectedHierarchyElement.deleteFromDatabase()
+            await this.selectedHierarchyElement.delete()
             this.isEditing = false
             location.href = '?'
         },
@@ -140,7 +140,7 @@ const vueApp = {
             }
         },
         async loadArticle() {
-            this.selectedArticle = await Article.loadFromDatabase(this.selectedHierarchyElement.ArticleId)
+            this.selectedArticle = await Article.load(this.selectedHierarchyElement.ArticleId)
             history.pushState(undefined, undefined, '?' + this.selectedHierarchyElement.Id)
         },
         async saveHierarchyElement(hierarchyElement) {
