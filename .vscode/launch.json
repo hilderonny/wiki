@@ -2,18 +2,9 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "NodeJS",
-            "args": [
-                "--port", "8443",
-                "--datapath", "../wiki/data",
-                "--crtfile", "./server.crt",
-                "--keyfile", "./server.key",
-                "--tokensecret", "hubbelebubbele",
-                "--htmlpath", "/=../wiki"
-            ],
-            "program": "${workspaceFolder}/../arrange/server.mjs",
+            "name": "Lokal",
+            "program": "${workspaceFolder}/WikiServer.mjs",
             "runtimeExecutable": "node",
-            "cwd": "${workspaceFolder}/../arrange",
             "request": "launch",
             "skipFiles": [
                 "<node_internals>/**"

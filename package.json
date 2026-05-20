@@ -1,0 +1,14 @@
+{
+  "name": "wiki",
+  "version": "2.0.0",
+  "main": "WikiServer.mjs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hilderonny/wiki.git"
+  },
+  "author": "Ronny Hildebrandt",
+  "license": "MIT",
+  "dependencies": {
+    "@hilderonny/arrange": "^7.0.0"
+  }
+}
