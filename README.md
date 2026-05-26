@@ -4,11 +4,11 @@ Dieses Wiki basiert auf https://github.com/hilderonny/arrange und speichert sein
 
 ### Vorschau
 
-![Preview](./images/screenshot-preview.webp)
+![Preview](./doc/screenshot-preview.webp)
 
 ### Editor
 
-![Editor](./images/screenshot-editor.webp)
+![Editor](./doc/screenshot-editor.webp)
 
 # Installation unter Linux als Hintergrunddienst
 
