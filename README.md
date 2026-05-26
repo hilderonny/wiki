@@ -18,12 +18,11 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
 \. "$HOME/.nvm/nvm.sh"
 nvm install 24
 
-# Repositories klonen
-git clone https://github.com/hilderonny/arrange.git
+# Repository klonen
 git clone https://github.com/hilderonny/wiki.git
 
 # Abhängigkeiten installieren
-cd arrange
+cd wiki
 npm install
 
 # Hintergrunddienst einrichten und starten
@@ -41,8 +40,8 @@ Danach ist das Wiki unter https://SERVER:8443 erreichbar.
 Description=wiki
 
 [Service]
-ExecStart=/######PFAD_ZU_NODE###### --experimental-sqlite /######PFAD_ZU_ARRANGE######/server.mjs --port 8443 --datapath /data --crtfile /server.crt --keyfile /server.key --tokensecret hubbelebubbele --htmlpath /=/######PFAD_ZU_WIKI######
-WorkingDirectory=/######PFAD_ZU_ARRANGE######
+ExecStart=/######PFAD_ZU_NODE###### --experimental-sqlite /######PFAD_ZU_WIKI######/WikiServer.mjs
+WorkingDirectory=/######PFAD_ZU_WIKI######
 Restart=always
 RestartSec=10
 
