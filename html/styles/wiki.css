@@ -190,7 +190,6 @@ td, th {
     flex: 1;
     margin: 0 auto;
     min-width: 50%;
-    max-width: 100ch;
     overflow: auto;
     padding: 2rem 3rem;
 

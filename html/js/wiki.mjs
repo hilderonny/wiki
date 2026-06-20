@@ -4,13 +4,34 @@ import Article from './types/Article.mjs'
 import Hierarchy from './types/Hierarchy.mjs'
 import NavigationElement from './components/navigation-element.mjs'
 
+// Marked-Parser überschreiben, sodass bei Mermaid-Diagrammen korrekte Code-Blöcke entstehen, die Mermaid verarbeiten kann
+const renderer = new marked.Renderer()
+const defaultCode = renderer.code.bind(renderer)
+renderer.code = function (code, infostring, escaped) {
+    if (code.lang === 'mermaid') {
+        // Roh-Text muss escaped werden, sonst bricht z.B. < die HTML-Struktur
+        const escapedText = code.text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        return `<pre class="mermaid">${escapedText}</pre>`
+    }
+    return defaultCode(code, infostring, escaped)
+}
+marked.use({ renderer })
+
+// Mermaid soll nicht gleich beim Start generieren
+mermaid.initialize({ startOnLoad: false })
+
 const vueApp = {
     components: {
         NavigationElement
     },
     computed: {
         formatSelectedArticle() {
-            return marked(this.selectedArticle?.Content || '')
+            return marked.parse(this.selectedArticle?.Content || '')
+        }
+    },
+    watch: {
+        formatSelectedArticle() {
+            this.$nextTick(this.renderMermaid)
         }
     },
     data() {
@@ -142,6 +163,10 @@ const vueApp = {
         async loadArticle() {
             this.selectedArticle = await Article.load(this.selectedHierarchyElement.ArticleId)
             history.pushState(undefined, undefined, '?' + this.selectedHierarchyElement.Id)
+        },
+        async renderMermaid() {
+            const blocks = document.querySelectorAll('pre.mermaid')
+            await mermaid.run({ nodes: blocks })
         },
         async saveHierarchyElement(hierarchyElement) {
             // Beim Speichern immer den Owner neu setzen - Wer schreiben kann, ist Owner, basta!
